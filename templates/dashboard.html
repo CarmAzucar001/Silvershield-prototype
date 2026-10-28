@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>{{ _("Silver Shield Dashboard") }}</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='landingStyle.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+
+</head>
+
+<body>
+
+<div class="loginBanner">
+
+<h1>SilverShield</h1>
+
+<div class="loginRegisterButtons">
+
+<div class="languageDropdown">
+    <button class="dropbtn">{{ _("Language") }}</button>
+    <div class="dropdownContent">
+        <a href="{{ url_for('set_language', lang='en', next=request.full_path) }}">English</a>
+        <a href="{{ url_for('set_language', lang='es', next=request.full_path) }}">Español</a>
+      <a href="{{ url_for('set_language', lang='zh', next=request.full_path) }}">中文</a>
+    </div>
+    </div>
+
+<button class="btn">
+<a href="{{ url_for('save_progress') }}">
+{{ _("Save") }}
+</a>
+</button>
+
+<button class="btn btn--assessment">
+<a href="{{ assessment_cta_url }}">
+{{ _(assessment_cta_title) }}
+</a>
+</button>
+
+<button class="loginButton">
+<a href="{{ url_for('logout') }}">
+{{ _("Logout") }}
+</a>
+</button>
+
+</div>
+
+</div>
+
+
+<div class="dashboardContainer">
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% set category, message = messages[0] %}
+<div class="dashboardFlash dashboardFlash-{{ category }}">{{ message }}</div>
+{% endif %}
+{% endwith %}
+
+<section class="dashboardHero">
+
+<div>
+
+<p class="dashboardEyebrow">{{ _("Training overview") }}</p>
+
+<h1>{{ _("Welcome to Your Learning Dashboard") }}</h1>
+
+<p>
+{{ _("Select a module below to begin your interactive learning experience.") }}
+</p>
+
+</div>
+
+<div class="heroSurveyCard">
+
+<h2>{{ _(assessment_cta_button_label) }}</h2>
+
+<p>{{ _(assessment_cta_description) }}</p>
+
+<a class="heroAction" href="{{ assessment_cta_url }}">{{ _(assessment_cta_hero_label) }}</a>
+
+</div>
+
+</section>
+
+<div class="modulesGrid">
+
+<a class="moduleCard" href="{{ url_for('module1') }}">
+
+<img class="moduleImage"
+src="{{ url_for('static',filename='images/module1Image.jpg')}}"
+alt="{{ _('Desktop simulation') }}">
+
+<div class="moduleContent">
+
+<h2>{{ _("Module 1: Desktop Simulation") }}</h2>
+
+<p>
+{{ _("Learn to identify phishing and scams through a simulated Desktop experience.") }}
+</p>
+
+</div>
+</a>
+
+
+<a class="moduleCard" href="{{ url_for('module2') }}">
+
+<img class="moduleImage"
+src="{{ url_for('static', filename='images/module2Image.jpg')}}"
+alt="{{ _('Cellphone simulation') }}">
+
+<div class="moduleContent">
+
+<h2>{{ _("Module 2: Cellphone Simulation") }}</h2>
+
+<p>
+{{ _("Learn to identify phishing and scams through a simulated Cellphone experience.") }}
+</p>
+
+</div>
+</a>
+
+ <a class="moduleCard" href="{{ url_for('phone_roleplay') }}">
+
+ <img class="moduleImage"
+  src="{{ url_for('static', filename='images/module3Image.jpg') }}"
+    alt="{{ _('Phone scam role-play') }}">
+
+  <div class="moduleContent">
+    <h2>{{ _("Module 3: Phone Scam Role-Play") }}</h2>
+    <p>{{ _("Practice responding to realistic scam phone calls through interactive role-playing scenarios.") }}</p>
+ </div>
+ </a>
+
+</div>
+
+<section class="analyticsSection">
+
+<div class="sectionHeadingRow">
+<h2>{{ _("Learning Analytics") }}</h2>
+<p>{{ _("Your scenario performance, progress, and assessment results update automatically.") }}</p>
+</div>
+
+<div class="metricsGrid" id="metricsGrid">
+
+<article class="metricCard">
+<span class="metricLabel">{{ _("Total Attempts") }}</span>
+<strong class="metricValue" id="totalAttempts">--</strong>
+</article>
+
+<article class="metricCard">
+<span class="metricLabel">{{ _("Success Rate") }}</span>
+<strong class="metricValue" id="successRate">--</strong>
+</article>
+
+<article class="metricCard">
+<span class="metricLabel">{{ _("Time Spent") }}</span>
+<strong class="metricValue" id="timeSpent">--</strong>
+</article>
+
+<article class="metricCard">
+<span class="metricLabel">{{ _("Indicators Found") }}</span>
+<strong class="metricValue" id="indicatorsFound">--</strong>
+</article>
+
+</div>
+
+<div class="analyticsPanels">
+
+<section class="panelCard">
+<div class="panelHeader">
+<h3>{{ _("Performance by Scenario") }}</h3>
+<p>{{ _("Accuracy, attempts, and clue recognition across each scam type.") }}</p>
+</div>
+<div id="performanceList" class="stackList loadingState">{{ _("Loading analytics...") }}</div>
+</section>
+
+<section class="panelCard">
+<div class="panelHeader">
+<h3>{{ _("Scenario Progress") }}</h3>
+<p>{{ _("Track how far you have progressed in each training stream.") }}</p>
+</div>
+<div id="moduleProgressList" class="stackList loadingState">{{ _("Loading progress...") }}</div>
+</section>
+
+<section class="panelCard">
+<div class="panelHeader">
+<h3>{{ _("Recent Attempts") }}</h3>
+<p>{{ _("Review your latest decisions and difficulty levels.") }}</p>
+</div>
+<div id="attemptHistoryList" class="stackList loadingState">{{ _("Loading attempt history...") }}</div>
+</section>
+
+<section class="panelCard panelWide">
+<div class="panelHeader">
+<h3>{{ _("Current Difficulty Levels") }}</h3>
+<p>{{ _("Your current adaptive difficulty for each training scenario.") }}</p>
+</div>
+<div id="difficultyList" class="difficultyGrid loadingState">{{ _("Loading difficulty progression...") }}</div>
+</section>
+
+</div>
+
+</section>
+</div>
+
+<script>
+window.dashboardLabels = {
+    loadingAnalytics: {{ _("Loading analytics...")|tojson }},
+    noPerformance: {{ _("No performance data yet. Complete a few scenarios to populate this section.")|tojson }},
+    noProgress: {{ _("No module progress yet. Start a module to begin tracking progress.")|tojson }},
+    noAttempts: {{ _("No attempts recorded yet.")|tojson }},
+    attempts: {{ _("attempts")|tojson }},
+    correct: {{ _("correct")|tojson }},
+    avgTime: {{ _("Avg. time")|tojson }},
+    completed: {{ _("completed")|tojson }},
+    difficultyLevel: {{ _("Level")|tojson }},
+    noDifficulty: {{ _("Difficulty data will appear after you start training.")|tojson }},
+    justNow: {{ _("just now")|tojson }},
+    minutes: {{ _("minutes")|tojson }},
+    minute: {{ _("minute")|tojson }},
+    seconds: {{ _("seconds")|tojson }},
+    desktop: {{ _("Desktop")|tojson }},
+    mobile: {{ _("Mobile")|tojson }},
+    email: {{ _("Email")|tojson }},
+    internet: {{ _("Internet")|tojson }},
+    sms: {{ _("SMS")|tojson }},
+    call: {{ _("Call")|tojson }},
+    web: {{ _("Web")|tojson }}
+};
+</script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+/* Shared foundation ------------------------------------------------------- */
+:root {
+  --brand-navy: #141f35;
+  --brand-blue: #0073e6;
+  --brand-blue-hover: #005bb5;
+  --text-on-dark: #ffffff;
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  min-height: 100%;
+  height: auto;
+  font-family: Arial, sans-serif;
+  background-color: var(--brand-navy);
+}
+
+/* JavaScript can reveal these elements by assigning an inline display value. */
+.is-hidden {
+  display: none;
+}
+
+h1 {
+  margin-bottom: 0.5rem;
+  color: white;
+  font-size: 50px;
+}
+
+h2 {
+  margin-bottom: 0.5rem;
+  color: white;
+  font-size: 25px;
+}
+
+p {
+  margin-bottom: 1.5rem;
+  color: #fff;
+}
+
+/* Inputs */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* Button */
+.btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--brand-blue);
+  color: var(--text-on-dark);
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btn > a {
+    color: white;
+}
+
+.btn:hover {
+  background: var(--brand-blue-hover);
+}
+
+/* Links */
+.links {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.links a {
+  color: #0073e6;
+  text-decoration: none;
+}
+
+.links a:hover {
+  text-decoration: underline;
+}

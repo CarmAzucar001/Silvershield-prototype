@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{{ _("Silvershield Login") }}</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+       <link rel="stylesheet" href="{{ url_for('static', filename='landingStyle.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='loginStyle.css') }}">
+</head>
+
+<body>
+
+<div class="loginBanner">
+       <h1>SilverShield</h1>
+       <div class="loginRegisterButtons">
+              <div class="languageDropdown">
+                     <button class="dropbtn">{{ _('Language') }}</button>
+                     <div class="dropdownContent">
+                            <a href="{{ url_for('set_language', lang='en', next=request.full_path) }}">English</a>
+                            <a href="{{ url_for('set_language', lang='es', next=request.full_path) }}">Español</a>
+                            <a href="{{ url_for('set_language', lang='zh', next=request.full_path) }}">中文</a>
+                     </div>
+              </div>
+       </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% set category, message = messages[0] %}
+<div class="dashboardContainer dashboardContainer--compact">
+       <div class="dashboardFlash dashboardFlash-{{ category }}">{{ message }}</div>
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="login-container">
+
+<!-- Left side - Login form -->
+
+<div class="login-left">
+
+<div class="login-form-wrapper">
+
+<form class="login-form" method="POST" onsubmit="return false;">
+
+<!-- Slide 1 -->
+
+<div class="login-slide slide active" id="login-slide1">
+
+<div class="form-group">
+
+<h1>{{ _("Welcome") }}</h1>
+
+<p>{{ _("Please log in to continue.") }}</p>
+
+<label for="login-username">
+{{ _("Email or Username") }}
+</label>
+
+<input type="text"
+       id="login-username"
+       name="username"
+       required>
+
+</div>
+
+
+<div class="form-group">
+
+<label for="login-password">
+{{ _("Password") }}
+</label>
+
+<input type="password"
+       id="login-password"
+       name="password"
+       required>
+
+</div>
+
+
+<div class="btn-group">
+
+<button type="button"
+        class="btn next-btn login-next">
+
+{{ _("Log In") }}
+
+</button>
+
+</div>
+
+
+<div class="links">
+
+<a href="#" class="login-forgot-password">
+{{ _("Forgot password?") }}
+</a>
+
+<span> | </span>
+
+<a href="{{ url_for('account_creation') }}">
+{{ _("Create account") }}
+</a>
+
+</div>
+
+</div>
+
+
+<!-- Slide 2 - OTP verification -->
+
+<div class="login-slide slide" id="login-slide2">
+
+<div class="form-group">
+
+<h1>{{ _("Verification") }}</h1>
+
+<p>{{ _("Enter OTP sent to your phone:") }}</p>
+
+<input type="text"
+       id="login-otp-code"
+       placeholder="{{ _('OTP') }}">
+
+<div class="login-otp-error"></div>
+
+<div class="btn-group">
+
+<button type="button"
+        class="btn login-verify-otp-btn">
+
+{{ _("Verify OTP") }}
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Slide 3 - request a reset code -->
+
+<div class="login-slide slide" id="login-slide3">
+
+<div class="form-group">
+
+<h1>{{ _("Forgot password") }}</h1>
+
+<p>{{ _("Enter the username or email on your account. We will text you a code.") }}</p>
+
+<label for="login-reset-username">
+{{ _("Email or Username") }}
+</label>
+
+<input type="text"
+       id="login-reset-username"
+       autocomplete="username">
+
+<div class="login-reset-error"></div>
+
+<div class="btn-group">
+
+<button type="button"
+        class="btn login-reset-send">
+
+{{ _("Send code") }}
+
+</button>
+
+</div>
+
+<div class="links">
+
+<a href="#" class="login-back-to-login">
+{{ _("Back to log in") }}
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Slide 4 - choose a new password -->
+
+<div class="login-slide slide" id="login-slide4">
+
+<div class="form-group">
+
+<h1>{{ _("New password") }}</h1>
+
+<p>{{ _("Choose a new password for your account.") }}</p>
+
+<label for="login-reset-password">
+{{ _("Password") }}
+</label>
+
+<input type="password"
+       id="login-reset-password"
+       autocomplete="new-password">
+
+<div class="login-reset-password-error"></div>
+
+<div class="btn-group">
+
+<button type="button"
+        class="btn login-reset-save">
+
+{{ _("Save password") }}
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</form>
+
+</div>
+</div>
+
+
+<!-- Right side background -->
+
+<div class="login-right"></div>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='auth.js') }}?v=2"></script>
+
+</body>
+</html>

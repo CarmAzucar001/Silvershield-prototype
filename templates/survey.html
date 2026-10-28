@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ survey.title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='landingStyle.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='survey.css') }}">
+</head>
+<body>
+  <div class="loginBanner">
+    <h1>SilverShield</h1>
+
+    <div class="loginRegisterButtons">
+      <div class="languageDropdown">
+        <button class="dropbtn">{{ _('Language') }}</button>
+        <div class="dropdownContent">
+          <a class="langLink" href="{{ url_for('set_language', lang='en', next=request.full_path) }}">English</a>
+          <a class="langLink" href="{{ url_for('set_language', lang='es', next=request.full_path) }}">Español</a>
+          <a class="langLink" href="{{ url_for('set_language', lang='zh', next=request.full_path) }}">中文</a>
+        </div>
+      </div>
+
+      <button class="loginButton">
+        <a href="{{ url_for('logout') }}">{{ _('Logout') }}</a>
+      </button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="surveyIntro">
+      {% if survey.description %}
+      <p>{{ survey.description }}</p>
+      {% endif %}
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% set category, message = messages[0] %}
+        <div class="flash">{{ message }}</div>
+      {% endif %}
+    {% endwith %}
+
+    {% set ns = namespace(total_pages=survey.sections|length) %}
+    {% if survey.consent %}{% set ns.total_pages = ns.total_pages + 1 %}{% endif %}
+
+    <div class="surveyProgress" id="surveyProgress">
+      {% for i in range(ns.total_pages) %}
+      <div class="surveyProgressDot {% if i == 0 %}active{% endif %}" id="dot-{{ i }}"></div>
+      {% endfor %}
+      <span class="surveyProgressLabel" id="progressLabel">{{ _('Page') }} 1 {{ _('of') }} {{ ns.total_pages }}</span>
+    </div>
+
+    <form method="POST" id="surveyForm" novalidate>
+      {% set page_index = namespace(value=0) %}
+
+      {% if survey.consent %}
+      <div class="surveyPage active" data-page="{{ page_index.value }}" id="consentPage">
+        <section class="sectionCard consentBox">
+          <p class="sectionNote">{{ survey.consent.details }}</p>
+          <p class="consentPrompt">{{ survey.consent.prompt }}</p>
+          <div class="choiceList">
+            <label class="choiceItem">
+              <input type="radio" name="consent_response" value="yes" data-required="true">
+              <span>{{ survey.consent.acceptLabel }}</span>
+            </label>
+            <label class="choiceItem">
+              <input type="radio" name="consent_response" value="no" data-required="true">
+              <span>{{ survey.consent.declineLabel }}</span>
+            </label>
+          </div>
+        </section>
+      </div>
+      {% set page_index.value = page_index.value + 1 %}
+      {% endif %}
+
+      {% for section in survey.sections %}
+      <div class="surveyPage {% if not survey.consent and loop.first %}active{% endif %}" data-page="{{ page_index.value }}">
+        <section class="sectionCard">
+          <h2 class="surveySectionTitle">{{ section.title }}</h2>
+          {% if section.instructions %}
+          <p class="sectionNote">{{ section.instructions }}</p>
+          {% endif %}
+
+          {% if section.type == 'likert' and section.questions and section.questions[0].scale %}
+          <div class="likertMatrixScroll">
+            {# The CSS grid column count comes from this section's survey data. #}
+            <div class="likertMatrix" style="--scale-count: {{ section.questions[0].scale.labels|length }};">
+              <div class="likertKeyRow">
+                <div></div>
+                {% for label in section.questions[0].scale.labels %}
+                <div class="likertKeyItem">{{ label }}</div>
+                {% endfor %}
+              </div>
+              <div class="likertHeader">
+                <div class="likertQuestionCol"></div>
+                {% for label in section.questions[0].scale.labels %}
+                <div title="{{ label }}">{{ loop.index }}</div>
+                {% endfor %}
+              </div>
+              {% for question in section.questions %}
+              <div class="likertRow">
+                <div class="likertQuestion">{{ question.text }}</div>
+                {% for label in question.scale.labels %}
+                <div class="likertRadioCell" title="{{ label }}">
+                  <input
+                    type="radio"
+                    name="{{ question.fieldName }}"
+                    value="{{ loop.index }}"
+                    aria-label="{{ question.text }} - {{ label }}"
+                    {% if question.required %}data-required="true"{% endif %}
+                  >
+                </div>
+                {% endfor %}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% else %}
+            {% for question in section.questions %}
+              <div class="questionBlock">
+                <p class="questionText">{{ question.text }}</p>
+                {% if question.type == 'numeric' %}
+                  <input type="number" name="{{ question.fieldName }}" step="1" inputmode="numeric"
+                    {% if question.min is defined %}min="{{ question.min }}"{% endif %}
+                    {% if question.max is defined %}max="{{ question.max }}"{% endif %}
+                    {% if question.required %}data-required="true"{% endif %}>
+                  {% if question.helperText %}
+                    <p class="sectionNote">{{ question.helperText }}</p>
+                  {% endif %}
+                {% elif question.type == 'openText' %}
+                  <textarea name="{{ question.fieldName }}" {% if question.required %}data-required="true"{% endif %}></textarea>
+                {% elif question.type == 'multiChoice' %}
+                  <div class="choiceList" {% if question.required %}data-required-group="{{ question.fieldName }}"{% endif %}>
+                    {% for option in question.options %}
+                    <label class="choiceItem">
+                      <input type="checkbox" name="{{ question.fieldName }}" value="{{ option }}">
+                      <span>{{ option }}</span>
+                    </label>
+                    {% endfor %}
+                  </div>
+                {% elif question.scale %}
+                  <div class="scaleList">
+                    {% for label in question.scale.labels %}
+                    <label class="choiceItem">
+                      <input type="radio" name="{{ question.fieldName }}" value="{{ loop.index }}" {% if question.required %}data-required="true"{% endif %}>
+                      <span>{{ loop.index }}. {{ label }}</span>
+                    </label>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <div class="choiceList">
+                    {% for option in question.options %}
+                    <label class="choiceItem">
+                      <input type="radio" name="{{ question.fieldName }}" value="{{ option }}" {% if question.required %}data-required="true"{% endif %}>
+                      <span>{{ option }}</span>
+                    </label>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          {% for subsection in section.subsections %}
+          <div class="subsection">
+            {% if subsection.topic and section.sectionId != 'S3' %}
+            <h3 class="surveySubsectionTitle">{{ subsection.topic }}</h3>
+            {% endif %}
+            {% if section.type == 'likert' and subsection.questions and subsection.questions[0].scale %}
+            <div class="likertMatrixScroll">
+              {# Each subsection can have a different number of scale labels. #}
+              <div class="likertMatrix" style="--scale-count: {{ subsection.questions[0].scale.labels|length }};">
+                <div class="likertKeyRow">
+                  <div></div>
+                  {% for label in subsection.questions[0].scale.labels %}
+                  <div class="likertKeyItem">{{ label }}</div>
+                  {% endfor %}
+                </div>
+                <div class="likertHeader">
+                  <div class="likertQuestionCol"></div>
+                  {% for label in subsection.questions[0].scale.labels %}
+                  <div title="{{ label }}">{{ loop.index }}</div>
+                  {% endfor %}
+                </div>
+                {% for question in subsection.questions %}
+                <div class="likertRow">
+                  <div class="likertQuestion">{{ question.text }}</div>
+                  {% for label in question.scale.labels %}
+                  <div class="likertRadioCell" title="{{ label }}">
+                    <input
+                      type="radio"
+                      name="{{ question.fieldName }}"
+                      value="{{ loop.index }}"
+                      aria-label="{{ question.text }} - {{ label }}"
+                      {% if question.required %}data-required="true"{% endif %}
+                    >
+                  </div>
+                  {% endfor %}
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% else %}
+            {% for question in subsection.questions %}
+            <div class="questionBlock">
+              <p class="questionText">{{ question.text }}</p>
+              {% if question.type == 'openText' %}
+                <textarea name="{{ question.fieldName }}" {% if question.required %}data-required="true"{% endif %}></textarea>
+              {% elif question.type == 'multiChoice' %}
+                <div class="choiceList" {% if question.required %}data-required-group="{{ question.fieldName }}"{% endif %}>
+                  {% for option in question.options %}
+                  <label class="choiceItem">
+                    <input type="checkbox" name="{{ question.fieldName }}" value="{{ option }}">
+                    <span>{{ option }}</span>
+                  </label>
+                  {% endfor %}
+                </div>
+              {% elif question.scale %}
+                <div class="scaleList">
+                  {% for label in question.scale.labels %}
+                  <label class="choiceItem">
+                    <input type="radio" name="{{ question.fieldName }}" value="{{ loop.index }}" {% if question.required %}data-required="true"{% endif %}>
+                    <span>{{ loop.index }}. {{ label }}</span>
+                  </label>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="choiceList">
+                  {% for option in question.options %}
+                  <label class="choiceItem">
+                    <input type="radio" name="{{ question.fieldName }}" value="{{ option }}" {% if question.required %}data-required="true"{% endif %}>
+                    <span>{{ option }}</span>
+                  </label>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+            {% endif %}
+          </div>
+          {% endfor %}
+        </section>
+      </div>
+      {% set page_index.value = page_index.value + 1 %}
+      {% endfor %}
+
+      <div class="navRow" id="navRow">
+        <button type="button" class="backBtn" id="backBtn" onclick="surveyNav(-1)">&#8592; {{ _('Back') }}</button>
+        <button type="button" id="nextBtn" onclick="surveyNav(1)">{{ _('Next') }} &#8594;</button>
+        <button type="submit" id="submitBtn">{{ _('Submit Survey') }}</button>
+      </div>
+    </form>
+
+    <script>
+      const TOTAL_PAGES = {{ ns.total_pages }};
+      const SURVEY_PHASE = {{ survey.phase|tojson }};
+      const DRAFT_KEY = 'surveyDraft:' + SURVEY_PHASE;
+      const I18N_PAGE = {{ _('Page')|tojson }};
+      const I18N_OF = {{ _('of')|tojson }};
+      const I18N_REQUIRED_PAGE = {{ _('Please answer all required questions on this page before continuing.')|tojson }};
+      const I18N_REQUIRED_SUBMIT = {{ _('Please answer all required questions before submitting.')|tojson }};
+      const I18N_CONSENT_REQUIRED = {{ _('Consent is required before Silver Shield can collect survey and analytics data.')|tojson }};
+      let currentPage = 0;
+
+      function checkConsentResponse() {
+        const consentPage = document.getElementById('consentPage');
+        if (!consentPage) {
+          return true; // No consent page, so consent is not applicable
+        }
+
+        const consentRadios = consentPage.querySelectorAll('input[name="consent_response"]');
+        const selectedConsent = Array.from(consentRadios).find(function(r) { return r.checked; });
+
+        if (!selectedConsent) {
+          return null; // Consent not answered
+        }
+
+        return selectedConsent.value === 'yes'; // True if "yes", false if "no"
+      }
+
+      function getPages() {
+        return document.querySelectorAll('.surveyPage');
+      }
+
+      function updateNav() {
+        const backBtn = document.getElementById('backBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const label = document.getElementById('progressLabel');
+
+        backBtn.style.display = currentPage === 0 ? 'none' : '';
+        nextBtn.style.display = currentPage === TOTAL_PAGES - 1 ? 'none' : '';
+        submitBtn.style.display = currentPage === TOTAL_PAGES - 1 ? '' : 'none';
+        label.textContent = I18N_PAGE + ' ' + (currentPage + 1) + ' ' + I18N_OF + ' ' + TOTAL_PAGES;
+
+        document.querySelectorAll('.surveyProgressDot').forEach(function(dot, i) {
+          dot.classList.remove('active', 'done');
+          if (i < currentPage) dot.classList.add('done');
+          else if (i === currentPage) dot.classList.add('active');
+        });
+      }
+
+      function validateCurrentPage() {
+        const pages = getPages();
+        const page = pages[currentPage];
+        let valid = true;
+
+        // Special validation for consent page
+        if (currentPage === 0 && document.getElementById('consentPage')) {
+          const consentResponse = checkConsentResponse();
+          if (consentResponse === null) {
+            return false; // Consent not answered
+          }
+          if (consentResponse === false) {
+            return false; // Consent was declined
+          }
+          return true; // Consent was granted, valid
+        }
+
+        // radio/select required
+        page.querySelectorAll('input[data-required]').forEach(function(input) {
+          if (input.type === 'radio') {
+            const group = page.querySelectorAll('input[name="' + input.name + '"]');
+            const checked = Array.from(group).some(function(r) { return r.checked; });
+            if (!checked) { valid = false; }
+          } else if (input.type === 'number' || input.tagName === 'TEXTAREA') {
+            if (!input.value.trim()) { valid = false; }
+          }
+        });
+
+        // textarea data-required
+        page.querySelectorAll('textarea[data-required]').forEach(function(ta) {
+          if (!ta.value.trim()) { valid = false; }
+        });
+
+        // multiChoice required groups
+        page.querySelectorAll('[data-required-group]').forEach(function(container) {
+          const name = container.getAttribute('data-required-group');
+          const checked = container.querySelectorAll('input[type="checkbox"]:checked');
+          if (checked.length === 0) { valid = false; }
+        });
+
+        return valid;
+      }
+
+      function surveyNav(direction) {
+        if (direction === 1 && !validateCurrentPage()) {
+          const consentResponse = checkConsentResponse();
+          if (currentPage === 0 && consentResponse === false) {
+            alert(I18N_CONSENT_REQUIRED);
+          } else {
+            alert(I18N_REQUIRED_PAGE);
+          }
+          return;
+        }
+
+        const pages = getPages();
+        pages[currentPage].classList.remove('active');
+        currentPage = Math.max(0, Math.min(TOTAL_PAGES - 1, currentPage + direction));
+        pages[currentPage].classList.add('active');
+        updateNav();
+        persistDraft();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function collectDraft() {
+        const form = document.getElementById('surveyForm');
+        const fields = {};
+        form.querySelectorAll('input, textarea, select').forEach(function(el) {
+          if (!el.name) {
+            return;
+          }
+          if (el.type === 'checkbox') {
+            if (!fields[el.name]) {
+              fields[el.name] = [];
+            }
+            if (el.checked) {
+              fields[el.name].push(el.value);
+            }
+            return;
+          }
+          if (el.type === 'radio') {
+            if (el.checked) {
+              fields[el.name] = el.value;
+            }
+            return;
+          }
+          fields[el.name] = el.value;
+        });
+        return {
+          page: currentPage,
+          fields: fields,
+        };
+      }
+
+      function persistDraft() {
+        try {
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(collectDraft()));
+        } catch (err) {
+          // Ignore storage failures (private mode/quota).
+        }
+      }
+
+      function restoreDraft() {
+        try {
+          const raw = localStorage.getItem(DRAFT_KEY);
+          if (!raw) {
+            return;
+          }
+          const draft = JSON.parse(raw);
+          const fields = draft.fields || {};
+          const form = document.getElementById('surveyForm');
+
+          form.querySelectorAll('input, textarea, select').forEach(function(el) {
+            if (!el.name || !(el.name in fields)) {
+              return;
+            }
+            const value = fields[el.name];
+            if (el.type === 'checkbox') {
+              el.checked = Array.isArray(value) && value.includes(el.value);
+              return;
+            }
+            if (el.type === 'radio') {
+              el.checked = value === el.value;
+              return;
+            }
+            if (typeof value === 'string') {
+              el.value = value;
+            }
+          });
+
+          if (typeof draft.page === 'number') {
+            const pages = getPages();
+            pages.forEach(function(page) { page.classList.remove('active'); });
+            currentPage = Math.max(0, Math.min(TOTAL_PAGES - 1, draft.page));
+            pages[currentPage].classList.add('active');
+          }
+        } catch (err) {
+          // Ignore malformed draft values.
+        }
+      }
+
+      // Intercept form submit to validate last page and consent
+      document.getElementById('surveyForm').addEventListener('submit', function(e) {
+        const consentResponse = checkConsentResponse();
+        
+        // Check if consent page exists and if consent was declined
+        if (document.getElementById('consentPage') && consentResponse === false) {
+          e.preventDefault();
+          alert(I18N_CONSENT_REQUIRED);
+          return;
+        }
+
+        if (!validateCurrentPage()) {
+          e.preventDefault();
+          alert(I18N_REQUIRED_SUBMIT);
+          return;
+        }
+        persistDraft();
+      });
+
+      document.getElementById('surveyForm').addEventListener('input', persistDraft);
+      document.getElementById('surveyForm').addEventListener('change', persistDraft);
+      document.querySelectorAll('.langLink').forEach(function(link) {
+        link.addEventListener('click', persistDraft);
+      });
+
+      restoreDraft();
+      updateNav();
+    </script>
+  </div>
+</body>
+</html>
