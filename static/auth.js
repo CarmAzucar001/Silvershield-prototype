@@ -14,17 +14,23 @@ const cityInput = document.getElementById("city");
 const stateInput = document.getElementById("state");
 const zipCodeInput = document.getElementById("zip-code");
 
+/*
 const sendOTPBtn = document.getElementById("send-otp-btn");
 const verifyOTPBtn = document.getElementById("verify-otp-btn");
 const otpSection = document.getElementById("otp-section");
 const otpError = document.getElementById("otp-error");
+*/
 
 /* Login elements */
 const loginSlides = document.querySelectorAll(".login-slide")
 const loginUsername = document.getElementById("login-username");
 const loginPassword = document.getElementById("login-password");
+
+/*
 const loginOTPCodeInput = document.getElementById("login-otp-code");
 const loginOtpError = document.querySelector(".login-otp-error");
+*/
+
 const loginNext = document.querySelector(".login-next");
 const loginVerifyOTPBtn = document.querySelector(".login-verify-otp-btn");
 const loginForgotPassword = document.querySelector(".login-forgot-password");
@@ -35,6 +41,11 @@ const loginResetPassword = document.getElementById("login-reset-password");
 const loginResetError = document.querySelector(".login-reset-error");
 const loginResetPasswordError = document.querySelector(".login-reset-password-error");
 let loginPurpose = "login";
+
+// Hide legacy SMS verification controls; phone numbers are validated locally only.
+document.querySelectorAll("#send-otp-btn, #verify-otp-btn, #otp-section").forEach((element) => {
+    element.hidden = true;
+});
 
 /* Phone and slide elements */
 let currentPhoneReg = "";
@@ -626,6 +637,7 @@ if(backButtons.length > 0)
 /********************************
       OTP - Registration
 *********************************/
+/*
 if(sendOTPBtn)
 {
     sendOTPBtn.addEventListener("click", async () => {
@@ -677,6 +689,7 @@ if(verifyOTPBtn)
         }
     });
 }
+*/
 
 /********************************
  Submission Button and Validation
