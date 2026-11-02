@@ -188,9 +188,11 @@ if (loginResetSend)
         currentPhoneLogin = result.phone;
         loginResetError.textContent = "";
         showLoginSlide(2);
+        /*
         loginOTPCodeInput.focus();
         loginOtpError.textContent = "OTP sent to your registered phone";
-    });
+        */
+        });
 }
 
 if (loginResetSave)
@@ -459,6 +461,7 @@ async function validateEmail(emailValue)
     return true;
 }
 
+/*
 async function validatePhone(phoneValue)
 {
     const phoneError = errorElement(phoneInput);
@@ -481,7 +484,37 @@ async function validatePhone(phoneValue)
     phoneInput.classList.remove('error');
     return true;
 }
+*/
+async function validatePhone(phoneValue)
+{
+    const phoneError = errorElement(phoneInput);
+    const digits = phoneValue.replace(/\D/g, "");
 
+    // Accept 10 digits or 11 digits beginning with 1.
+    const validLength =
+        digits.length === 10 ||
+        (digits.length === 11 && digits.startsWith("1"));
+
+    if (!phoneValue.trim())
+    {
+        phoneError.textContent = "Phone number cannot be blank.";
+        phoneInput.classList.add("error");
+        return false;
+    }
+
+    if (!validLength)
+    {
+        phoneError.textContent =
+            "Enter a valid 10-digit US phone number.";
+        phoneInput.classList.add("error");
+        return false;
+    }
+
+    phoneError.textContent = "";
+    phoneInput.classList.remove("error");
+
+    return true;
+}
 function validateStreet(streetValue)
 {
     const streetAddressInputError = errorElement(streetAddressInput);
@@ -601,12 +634,14 @@ if(nextButtons.length > 0)
                     break;
                 case 4:
                     letProceed = await validatePhone(phoneInput.value.trim());
+                    /*
                     const otpMessage = otpError.textContent.toLowerCase();
                     if (!otpMessage.includes("verified"))
                     {
                         otpError.textContent = "Please verify your phone number before continuing.";
                         letProceed = false;
                     }
+                    */
                     break;
                 case 5:
                     letProceed = await validateAddress();
