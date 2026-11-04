@@ -262,7 +262,7 @@ textarea {
 .surveyPage { display: none; }
 .surveyPage.active { display: contents; }
 /* Small-screen layout. */
-@media (max-width: 720px) {
+/*@media (max-width: 720px) {
   .wrap {
     padding: 8.25rem 14px 34px;
   }
@@ -278,4 +278,81 @@ textarea {
   .navRow button {
     flex: 1;
   }
+}*/
+
+
+@media screen and (max-width: 500px){
+  .wrap {
+    padding: 2rem 14px 2rem;
+  }
+  .sectionCard {
+    padding: 18px;
+  }
+
+  .navRow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+    box-sizing: border-box;
+    
+  }
+  .navRow button {
+    flex: 0 1 48%;
+    min-width: 0;
+    max-width: 48%;
+    padding: 12px 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    gap: 20px
+  }
+
+  #surveyForm:has(.surveyPage.active[data-page="2"]) .navRow,
+    #surveyForm:has(.surveyPage.active[data-page="4"]) .navRow,
+    #surveyForm:has(.surveyPage.active[data-page="5"]) .navRow {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 10px;
+        box-sizing: border-box;
+        transform: translate(-10.5rem, -5.5rem) scale(0.5)
+        
+    }
+
+    /* Resize the navigation buttons */
+    #surveyForm:has(.surveyPage.active[data-page="2"]) .navRow button,
+    #surveyForm:has(.surveyPage.active[data-page="4"]) .navRow button,
+    #surveyForm:has(.surveyPage.active[data-page="5"]) .navRow button {
+        flex: 0 1 48%;
+        min-width: 0;
+        max-width: 48%;
+        padding: 13px 8px;
+        font-size: 24px;
+        box-sizing: border-box;
+    }
+
+  .surveyPage[data-page = "2"] .sectionCard {
+    transform: translate(-23%, -150px) scale(0.5);
+  }
+
+  .surveyPage[data-page = "2"] .navRow {
+    transform: scale(0.5);
+  }
+
+  .surveyPage[data-page = "4"] .sectionCard {
+    transform: translate(-23%, -150px) scale(0.5);
+  }
+
+  .surveyPage[data-page = "5"] .sectionCard {
+    transform: translate(-23%, -150px) scale(0.5);
+  }
+  .surveyIntro {
+    margin-top: 50px
+  }
+    
 }
