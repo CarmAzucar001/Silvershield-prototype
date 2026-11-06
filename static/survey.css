@@ -283,7 +283,7 @@ textarea {
 
 @media screen and (max-width: 500px){
   .wrap {
-    padding: 2rem 14px 2rem;
+    padding: 7rem 14px 2rem;
   }
   .sectionCard {
     padding: 18px;
