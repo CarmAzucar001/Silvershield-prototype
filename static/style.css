@@ -42,6 +42,13 @@ p {
   color: #fff;
 }
 
+@media screen and (max-width: 500px) and (orientation: portrait){
+  h1 {
+    font-size: 40px;
+    padding-top: 5%;
+  }
+}
+
 /* Inputs */
 .form-group {
   margin-bottom: 1rem;
