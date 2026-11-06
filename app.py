@@ -1,7 +1,3 @@
-
-#TESTING WHETHER PUSHING WORKS, IGNORE THIS COMMENT 
-#TESTING AGAIN
-#TESTING 3X
 from flask import Flask, render_template, request, jsonify, flash, session, redirect, url_for, send_file, abort
 import os
 import sqlite3
@@ -11,7 +7,8 @@ from dotenv import load_dotenv
 import requests
 from database import init_database, TEST_USER_USERNAME
 from user_login import find_account, update_password, user_registration, verifying_login
-# from TWOFA import send_otp, verify_otp
+from database import init_database, TEST_USER_USERNAME, create_guest_session, is_guest_username
+#from TWOFA import send_otp, verify_otp
 from flask_babel import Babel, gettext, get_locale, _
 import json
 from datetime import datetime, timezone
@@ -863,6 +860,30 @@ def api_learning_metrics():
 def save_progress():
     flash('Progress saved successfully!', 'success')
     return render_template("dashboard.html")
+################################
+#      Guest session route
+################################
+@app.route('/guest', methods=['POST'])
+def continue_as_guest():
+    consent = (request.form.get('consent') or '').strip().lower()
+    if consent != 'yes':
+        return jsonify({
+            "success": False,
+            "message": "Please agree to take part before continuing."
+        }), 400
+
+    try:
+        guest_id = create_guest_session(True)
+    except Exception:
+        return jsonify({
+            "success": False,
+            "message": "Could not start a guest session."
+        }), 500
+
+    session['username'] = guest_id
+    session['is_guest'] = True
+    return jsonify(success=True, redirect_url=url_for('pre_survey'))
+
 
 ################################
 #      Registration route
@@ -890,6 +911,10 @@ def login_post():
     usernameorEmail = request.form['username'].strip()
     password = request.form['password'].strip()
 
+    if is_guest_username(usernameorEmail):
+        return jsonify({"success": False, "message": "Invalid username or password"})
+
+
     valid, phone, canonical_username = verifying_login(usernameorEmail, password)
 
     if not valid:
@@ -898,12 +923,15 @@ def login_post():
     # Storing logged in user for session
     session["username"] = canonical_username
 
+
     return jsonify({
-            "success": True,
-            "otp_sent": False,
-            "twilio_bypassed": True,
-            "message": "Login successful"
-        })
+        "success": True,
+        "otp_sent": False,
+        "twilio_bypassed": True,
+        "message": "Login successful"
+    })
+
+
     
     """
     if canonical_username == TEST_USER_USERNAME:
@@ -961,7 +989,8 @@ def send_otp_route():
     return jsonify({
         "success": False,
         "message": "SMS verification is disabled."
-    }), 410
+     }),410
+
     """
     phone = request.form['phone']
 
@@ -987,10 +1016,11 @@ def _password_is_strong(password):
         and any(character.isdigit() for character in password)
         and any(character in special for character in password)
     )
-    """
+    
 
 @app.route('/forgot_password/send', methods=['POST'])
 def forgot_password_send():
+
     return jsonify({
         "success": False,
         "message": "Password recovery is temporaily unavailable. Twilio."
@@ -1053,7 +1083,6 @@ def forgot_password_verify():
     session["reset_verified"] = True
     return jsonify({"success": True, "message": "OTP verified"})
     """
-
 @app.route('/forgot_password/update', methods=['POST'])
 def forgot_password_update():
     
@@ -1078,11 +1107,11 @@ def forgot_password_update():
 
 @app.route('/verify_otp', methods=['POST'])
 def verify_otp_route():
+
     return jsonify({
         "success": False,
         "message": "SMS verification is disabled."
     }), 410
-
     """
     if session.get("username") == TEST_USER_USERNAME:
         return jsonify({"success": True, "message": "OTP bypassed for test user"})
@@ -1101,7 +1130,6 @@ def verify_otp_route():
     except Exception as e:
         print("Error verifying OTP", e)
         return jsonify({"success": False, "message": str(e)})
-    """
     """
 ##############################
 # Phone Roleplay AI

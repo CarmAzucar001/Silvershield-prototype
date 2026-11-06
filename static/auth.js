@@ -14,7 +14,7 @@ const cityInput = document.getElementById("city");
 const stateInput = document.getElementById("state");
 const zipCodeInput = document.getElementById("zip-code");
 
-/*
+/* hiding OTP section
 const sendOTPBtn = document.getElementById("send-otp-btn");
 const verifyOTPBtn = document.getElementById("verify-otp-btn");
 const otpSection = document.getElementById("otp-section");
@@ -46,6 +46,7 @@ let loginPurpose = "login";
 document.querySelectorAll("#send-otp-btn, #verify-otp-btn, #otp-section").forEach((element) => {
     element.hidden = true;
 });
+
 
 /* Phone and slide elements */
 let currentPhoneReg = "";
@@ -188,11 +189,12 @@ if (loginResetSend)
         currentPhoneLogin = result.phone;
         loginResetError.textContent = "";
         showLoginSlide(2);
+
         /*
         loginOTPCodeInput.focus();
         loginOtpError.textContent = "OTP sent to your registered phone";
         */
-        });
+    });
 }
 
 if (loginResetSave)
@@ -304,6 +306,67 @@ if(loginVerifyOTPBtn)
         alert("Login successful!");
         window.location.href = "/dashboard";
     })
+}
+
+const guestStart = document.getElementById("guest-start");
+const guestBack = document.getElementById("guest-back");
+const guestConfirm = document.getElementById("guest-confirm");
+const guestConsent = document.getElementById("guest-consent");
+const guestError = document.getElementById("guest-error");
+
+if (guestStart)
+{
+    guestStart.addEventListener("click", () => {
+        showLoginSlide(5);
+    });
+}
+
+if (guestBack)
+{
+    guestBack.addEventListener("click", () => {
+        if (guestError)
+        {
+            guestError.textContent = "";
+        }
+        showLoginSlide(1);
+    });
+}
+
+if (guestConfirm)
+{
+    guestConfirm.addEventListener("click", async () => {
+        if (!guestConsent || !guestConsent.checked)
+        {
+            if (guestError)
+            {
+                guestError.textContent = "Please agree to take part before continuing.";
+            }
+            return;
+        }
+
+        if (guestError)
+        {
+            guestError.textContent = "";
+        }
+
+        const response = await fetch("/guest", {
+            method: "POST",
+            body: new URLSearchParams({consent: "yes"})
+        });
+
+        const result = await response.json();
+
+        if (!result.success)
+        {
+            if (guestError)
+            {
+                guestError.textContent = result.message || "Could not start a guest session.";
+            }
+            return;
+        }
+
+        window.location.href = result.redirect_url || "/pre_survey";
+    });
 }
 
 /***********************************
@@ -461,7 +524,7 @@ async function validateEmail(emailValue)
     return true;
 }
 
-/*
+
 async function validatePhone(phoneValue)
 {
     const phoneError = errorElement(phoneInput);
@@ -484,37 +547,7 @@ async function validatePhone(phoneValue)
     phoneInput.classList.remove('error');
     return true;
 }
-*/
-async function validatePhone(phoneValue)
-{
-    const phoneError = errorElement(phoneInput);
-    const digits = phoneValue.replace(/\D/g, "");
 
-    // Accept 10 digits or 11 digits beginning with 1.
-    const validLength =
-        digits.length === 10 ||
-        (digits.length === 11 && digits.startsWith("1"));
-
-    if (!phoneValue.trim())
-    {
-        phoneError.textContent = "Phone number cannot be blank.";
-        phoneInput.classList.add("error");
-        return false;
-    }
-
-    if (!validLength)
-    {
-        phoneError.textContent =
-            "Enter a valid 10-digit US phone number.";
-        phoneInput.classList.add("error");
-        return false;
-    }
-
-    phoneError.textContent = "";
-    phoneInput.classList.remove("error");
-
-    return true;
-}
 function validateStreet(streetValue)
 {
     const streetAddressInputError = errorElement(streetAddressInput);
@@ -634,14 +667,12 @@ if(nextButtons.length > 0)
                     break;
                 case 4:
                     letProceed = await validatePhone(phoneInput.value.trim());
-                    /*
                     const otpMessage = otpError.textContent.toLowerCase();
                     if (!otpMessage.includes("verified"))
                     {
                         otpError.textContent = "Please verify your phone number before continuing.";
                         letProceed = false;
                     }
-                    */
                     break;
                 case 5:
                     letProceed = await validateAddress();
@@ -671,9 +702,7 @@ if(backButtons.length > 0)
 
 /********************************
       OTP - Registration
-*********************************/
-/*
-if(sendOTPBtn)
+*********************************/if (sendOTPBtn)
 {
     sendOTPBtn.addEventListener("click", async () => {
         const phone = phoneInput.value.trim();
@@ -747,7 +776,6 @@ if (verifyOTPBtn)
         }
     });
 }
-*/
 
 /********************************
  Submission Button and Validation
