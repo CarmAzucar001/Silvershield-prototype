@@ -2,7 +2,7 @@
 <html lang="{{ get_locale() }}">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" >
 
   <title>{{ _("Desktop Module") }}</title>
 
@@ -129,7 +129,7 @@
 
                 <div class="desktop-actions-row">
                     <div class="email-controls">
-                        <button id="readAloudBtn" class="rf-btn">{{ _("Read aloud") }}</button>
+                        <button id="readAloudBtn" class="rf-btn read-aloud-btn">{{ _("Read aloud") }}</button>
                     </div>
 
                     <div id="emailButtons" class="rf-container is-hidden">
@@ -235,7 +235,7 @@
 
         <div class="desktop-actions-row">
             <div class="internet-controls">
-                <button id="internetReadAloudBtn" class="rf-btn">{{ _("Read aloud") }}</button>
+                <button id="internetReadAloudBtn" class="rf-btn read-aloud-btn">{{ _("Read aloud") }}</button>
             </div>
 
             <div id="internetButtons" class="site-actions is-hidden">

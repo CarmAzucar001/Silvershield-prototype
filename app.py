@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import requests
 from database import init_database, TEST_USER_USERNAME
 from user_login import find_account, update_password, user_registration, verifying_login
-from TWOFA import send_otp, verify_otp
+#from TWOFA import send_otp, verify_otp
 from flask_babel import Babel, gettext, get_locale, _
 import json
 from datetime import datetime, timezone
@@ -894,6 +894,17 @@ def login_post():
     # Storing logged in user for session
     session["username"] = canonical_username
 
+
+    return jsonify({
+        "success": True,
+        "otp_sent": False,
+        "twilio_bypassed": True,
+        "message": "Login successful"
+    })
+
+
+    
+    """
     if canonical_username == TEST_USER_USERNAME:
         return jsonify({
             "success": True,
@@ -901,7 +912,7 @@ def login_post():
             "twilio_bypassed": True,
             "message": "Test user logged in without OTP"
         })
-
+    
     if not phone.startswith("+"):
         phone = "+1" + phone
 
@@ -910,6 +921,7 @@ def login_post():
         return jsonify({"success": True, "otp_sent": True, "phone": phone})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
+    """
 
 ################################
 #       Validation route
@@ -944,6 +956,13 @@ def check_email():
 
 @app.route('/send_otp', methods=['POST'])
 def send_otp_route():
+
+    return jsonify({
+        "success": False,
+        "message": "SMS verification is disabled."
+     }),410
+
+    """
     phone = request.form['phone']
 
     if not phone.startswith("+"):
@@ -955,7 +974,8 @@ def send_otp_route():
     except Exception as e:
         print("Error sending OTP", e)
         return jsonify({"success": False, "message": str(e)})
-
+    """
+    
 def _password_is_strong(password):
     if not isinstance(password, str):
         return False
@@ -967,9 +987,16 @@ def _password_is_strong(password):
         and any(character.isdigit() for character in password)
         and any(character in special for character in password)
     )
+    
 
 @app.route('/forgot_password/send', methods=['POST'])
 def forgot_password_send():
+
+    return jsonify({
+        "success": False,
+        "message": "Password recovery is temporaily unavailable. Twilio."
+    }), 410
+    """
     username_or_email = (request.form.get('username') or '').strip()
     if not username_or_email:
         return jsonify({"success": False, "message": "Enter your username or email"})
@@ -997,9 +1024,16 @@ def forgot_password_send():
         return jsonify({"success": False, "message": str(e)})
 
     return jsonify({"success": True, "otp_sent": True, "phone": phone})
+    """
 
 @app.route('/forgot_password/verify', methods=['POST'])
 def forgot_password_verify():
+    return jsonify({
+        "success": False,
+        "message": "Password recovery is temporarily unavailable."
+    }), 410
+
+    """
     username = session.get("reset_username")
     if not username:
         return jsonify({"success": False, "message": "Request a reset code first"})
@@ -1019,9 +1053,10 @@ def forgot_password_verify():
 
     session["reset_verified"] = True
     return jsonify({"success": True, "message": "OTP verified"})
-
+    """
 @app.route('/forgot_password/update', methods=['POST'])
 def forgot_password_update():
+    
     username = session.get("reset_username")
     if not username or not session.get("reset_verified"):
         return jsonify({"success": False, "message": "Verify the text code before choosing a new password"})
@@ -1039,9 +1074,16 @@ def forgot_password_update():
     session.pop("reset_username", None)
     session.pop("reset_verified", None)
     return jsonify({"success": True, "message": "Password updated. Log in with your new password."})
+    
 
 @app.route('/verify_otp', methods=['POST'])
 def verify_otp_route():
+
+    return jsonify({
+        "success": False,
+        "message": "SMS verification is disabled."
+    }), 410
+    """
     if session.get("username") == TEST_USER_USERNAME:
         return jsonify({"success": True, "message": "OTP bypassed for test user"})
 
@@ -1059,7 +1101,7 @@ def verify_otp_route():
     except Exception as e:
         print("Error verifying OTP", e)
         return jsonify({"success": False, "message": str(e)})
-
+    """
 ##############################
 # Phone Roleplay AI
 ##############################
