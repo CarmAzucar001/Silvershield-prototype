@@ -1,6 +1,10 @@
 /*****************************
  Desktop Background and Icons
 *****************************/
+html{
+    overflow:hidden;
+    
+}
 body {
     margin: 0;
     height: 100vh;
@@ -363,8 +367,6 @@ a new CSS class called help that use different values*/
     border-radius: 6px;
     font-weight: bold;
     border: 1px solid rgba(0, 0, 0, 0.18);
-    background: #486a8a;
-    color: white;
 }
 
 .rf-btn.real {
@@ -376,6 +378,17 @@ a new CSS class called help that use different values*/
     background: #c13b32;
     color: white;
 }
+
+.rf-btn.voice-answer-btn{
+    background:#486a8a;
+    color:white;
+}
+
+.rf-btn.read-aloud-btn{
+    background:#486a8a;
+    color:white;
+}
+
 
 .feedback-box {
     position: absolute;

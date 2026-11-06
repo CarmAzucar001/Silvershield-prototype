@@ -678,49 +678,72 @@ if(sendOTPBtn)
     sendOTPBtn.addEventListener("click", async () => {
         const phone = phoneInput.value.trim();
 
-        if(!phone)
+        if (!(await validatePhone(phone)))
             return;
 
-        const response = await fetch("/send_otp", {
-            method: "POST",
-            body: new URLSearchParams({phone})
-        });
+        sendOTPBtn.disabled = true;
+        otpError.textContent = "Sending...";
 
-        const result = await response.json();
-        if(result.success)
+        try
         {
-            otpSection.style.display = "block";
-            otpError.textContent = "OTP sent to your phone";
-            currentPhoneReg = phone;
+            const response = await fetch("/send_otp", {
+                method: "POST",
+                body: new URLSearchParams({phone})
+            });
+            console.log("send_otp status:", response.status);
+
+            const result = await response.json();
+
+            if (result.success)
+            {
+                otpSection.classList.remove("is-hidden");
+                otpError.textContent = "OTP sent to your phone";
+                currentPhoneReg = phone;
+            }
+            else
+            {
+                otpError.textContent = result.message || "Could not send OTP.";
+            }
         }
-        else
+        catch (error)
         {
-            otpError.textContent = result.message;
+            console.error("send_otp failed:", error);
+            otpError.textContent = "Could not send OTP. Try again.";
+        }
+        finally
+        {
+            sendOTPBtn.disabled = false;
         }
     });
 }
 
-if(verifyOTPBtn)
+if (verifyOTPBtn)
 {
     verifyOTPBtn.addEventListener("click", async () => {
-        const phone = phoneInput.value.trim();
         const code = document.getElementById("otp-code").value.trim();
 
-        const response = await fetch("/verify_otp", {
-            method: "POST",
-            body: new URLSearchParams({ phone, code })
-        });
-
-        const result = await response.json();
-        if (result.success) {
-            alert("Phone verified!");
-            otpError.textContent = "Phone verified!";
-            otpSection.style.display = "none";
-            document.querySelector("#slide4 .next-btn").disabled = false;
-        }
-        else
+        try
         {
-            otpError.textContent = result.message;
+            const response = await fetch("/verify_otp", {
+                method: "POST",
+                body: new URLSearchParams({phone: currentPhoneReg, code})
+            });
+            const result = await response.json();
+
+            if (result.success)
+            {
+                otpError.textContent = "Phone verified!";
+                otpSection.classList.add("is-hidden");
+                document.querySelector("#slide4 .next-btn").disabled = false;
+            }
+            else
+            {
+                otpError.textContent = result.message;
+            }
+        }
+        catch (error)
+        {
+            otpError.textContent = "Could not verify the code. Try again.";
         }
     });
 }

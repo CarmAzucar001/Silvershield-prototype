@@ -974,7 +974,8 @@ def send_otp_route():
     except Exception as e:
         print("Error sending OTP", e)
         return jsonify({"success": False, "message": str(e)})
-
+    """
+    
 def _password_is_strong(password):
     if not isinstance(password, str):
         return False
@@ -1055,6 +1056,7 @@ def forgot_password_verify():
 
 @app.route('/forgot_password/update', methods=['POST'])
 def forgot_password_update():
+    
     username = session.get("reset_username")
     if not username or not session.get("reset_verified"):
         return jsonify({"success": False, "message": "Verify the text code before choosing a new password"})
@@ -1072,6 +1074,7 @@ def forgot_password_update():
     session.pop("reset_username", None)
     session.pop("reset_verified", None)
     return jsonify({"success": True, "message": "Password updated. Log in with your new password."})
+    
 
 @app.route('/verify_otp', methods=['POST'])
 def verify_otp_route():
@@ -1099,7 +1102,7 @@ def verify_otp_route():
         print("Error verifying OTP", e)
         return jsonify({"success": False, "message": str(e)})
     """
-    
+    """
 ##############################
 # Phone Roleplay AI
 ##############################
