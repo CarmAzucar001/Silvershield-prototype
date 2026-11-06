@@ -316,7 +316,7 @@
     }
 }
 
-@media (max-width: 640px) {
+/*@media (max-width: 640px) {
     .dashboardContainer {
         padding-top: 13rem;
         padding-left: 1rem;
@@ -328,5 +328,24 @@
         margin: 1rem;
         padding-right: 1rem;
         flex-wrap: wrap;
+    }
+}*/
+
+@media screen and (max-width: 500px) and (orientation: portrait){
+    .dashboardContainer {
+        padding-top: 15rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .loginRegisterButtons {
+        display: flex;
+        flex-direction: row;
+        transform: translate(-75%, 70%) scale(0.8);
+        gap: 0.6rem;
+        margin: 1rem;
+        padding-right: 1rem;
+        padding-bottom: 3rem;
+        flex-wrap: nowrap;
     }
 }
