@@ -1,6 +1,10 @@
 /*****************************
  Desktop Background and Icons
 *****************************/
+html{
+    overflow:hidden;
+    
+}
 body {
     margin: 0;
     height: 100vh;
@@ -363,8 +367,6 @@ a new CSS class called help that use different values*/
     border-radius: 6px;
     font-weight: bold;
     border: 1px solid rgba(0, 0, 0, 0.18);
-    background: #486a8a;
-    color: white;
 }
 
 .rf-btn.real {
@@ -376,6 +378,17 @@ a new CSS class called help that use different values*/
     background: #c13b32;
     color: white;
 }
+
+.rf-btn.voice-answer-btn{
+    background:#486a8a;
+    color:white;
+}
+
+.rf-btn.read-aloud-btn{
+    background:#486a8a;
+    color:white;
+}
+
 
 .feedback-box {
     position: absolute;
@@ -1202,4 +1215,48 @@ a new CSS class called help that use different values*/
     background: white;
     border: 1px solid #dbe3ef;
     border-radius: 14px;
+}
+
+/*Media Query for the Mobile phone*/
+
+@media(max-width: 768px){
+    body {
+    width:100%;
+    overflow:hidden;
+    }
+    .taskbar{
+        width:100%;
+        box-sizing:border-box;
+    }
+    .popup {
+        top:0;
+        width:100%;
+        left:0;
+        height: calc(100% - 55px);
+    }
+
+    .gmail-sidebar,
+    .gmail-message-toolbar,
+    .chrome-bookmarks-row,
+    .chrome-nav-buttons,
+    .searchIcon{
+    display:none;
+    }
+
+    .site-actions{
+        display:flex;
+        flex-direction:row-reverse;
+    }
+    .rf-btn{
+        padding:10px;
+        font-size:18px;
+        margin-right:10px;
+    }
+
+
+    .rf-btn.fake,
+    .rf-btn.real
+    .rf-btn.voice-answer-btn{
+        width:25%;
+    }
 }

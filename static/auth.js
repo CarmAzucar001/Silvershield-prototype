@@ -14,17 +14,23 @@ const cityInput = document.getElementById("city");
 const stateInput = document.getElementById("state");
 const zipCodeInput = document.getElementById("zip-code");
 
+/* hiding OTP section
 const sendOTPBtn = document.getElementById("send-otp-btn");
 const verifyOTPBtn = document.getElementById("verify-otp-btn");
 const otpSection = document.getElementById("otp-section");
 const otpError = document.getElementById("otp-error");
+*/
 
 /* Login elements */
 const loginSlides = document.querySelectorAll(".login-slide")
 const loginUsername = document.getElementById("login-username");
 const loginPassword = document.getElementById("login-password");
+
+/*
 const loginOTPCodeInput = document.getElementById("login-otp-code");
 const loginOtpError = document.querySelector(".login-otp-error");
+*/
+
 const loginNext = document.querySelector(".login-next");
 const loginVerifyOTPBtn = document.querySelector(".login-verify-otp-btn");
 const loginForgotPassword = document.querySelector(".login-forgot-password");
@@ -35,6 +41,12 @@ const loginResetPassword = document.getElementById("login-reset-password");
 const loginResetError = document.querySelector(".login-reset-error");
 const loginResetPasswordError = document.querySelector(".login-reset-password-error");
 let loginPurpose = "login";
+
+// Hide legacy SMS verification controls; phone numbers are validated locally only.
+document.querySelectorAll("#send-otp-btn, #verify-otp-btn, #otp-section").forEach((element) => {
+    element.hidden = true;
+});
+
 
 /* Phone and slide elements */
 let currentPhoneReg = "";
@@ -177,8 +189,11 @@ if (loginResetSend)
         currentPhoneLogin = result.phone;
         loginResetError.textContent = "";
         showLoginSlide(2);
+
+        /*
         loginOTPCodeInput.focus();
         loginOtpError.textContent = "OTP sent to your registered phone";
+        */
     });
 }
 
@@ -291,6 +306,67 @@ if(loginVerifyOTPBtn)
         alert("Login successful!");
         window.location.href = "/dashboard";
     })
+}
+
+const guestStart = document.getElementById("guest-start");
+const guestBack = document.getElementById("guest-back");
+const guestConfirm = document.getElementById("guest-confirm");
+const guestConsent = document.getElementById("guest-consent");
+const guestError = document.getElementById("guest-error");
+
+if (guestStart)
+{
+    guestStart.addEventListener("click", () => {
+        showLoginSlide(5);
+    });
+}
+
+if (guestBack)
+{
+    guestBack.addEventListener("click", () => {
+        if (guestError)
+        {
+            guestError.textContent = "";
+        }
+        showLoginSlide(1);
+    });
+}
+
+if (guestConfirm)
+{
+    guestConfirm.addEventListener("click", async () => {
+        if (!guestConsent || !guestConsent.checked)
+        {
+            if (guestError)
+            {
+                guestError.textContent = "Please agree to take part before continuing.";
+            }
+            return;
+        }
+
+        if (guestError)
+        {
+            guestError.textContent = "";
+        }
+
+        const response = await fetch("/guest", {
+            method: "POST",
+            body: new URLSearchParams({consent: "yes"})
+        });
+
+        const result = await response.json();
+
+        if (!result.success)
+        {
+            if (guestError)
+            {
+                guestError.textContent = result.message || "Could not start a guest session.";
+            }
+            return;
+        }
+
+        window.location.href = result.redirect_url || "/pre_survey";
+    });
 }
 
 /***********************************
@@ -447,6 +523,7 @@ async function validateEmail(emailValue)
     emailInput.classList.remove('error');
     return true;
 }
+
 
 async function validatePhone(phoneValue)
 {
@@ -625,55 +702,77 @@ if(backButtons.length > 0)
 
 /********************************
       OTP - Registration
-*********************************/
-if(sendOTPBtn)
+*********************************/if (sendOTPBtn)
 {
     sendOTPBtn.addEventListener("click", async () => {
         const phone = phoneInput.value.trim();
 
-        if(!phone)
+        if (!(await validatePhone(phone)))
             return;
 
-        const response = await fetch("/send_otp", {
-            method: "POST",
-            body: new URLSearchParams({phone})
-        });
+        sendOTPBtn.disabled = true;
+        otpError.textContent = "Sending...";
 
-        const result = await response.json();
-        if(result.success)
+        try
         {
-            otpSection.style.display = "block";
-            otpError.textContent = "OTP sent to your phone";
-            currentPhoneReg = phone;
+            const response = await fetch("/send_otp", {
+                method: "POST",
+                body: new URLSearchParams({phone})
+            });
+            console.log("send_otp status:", response.status);
+
+            const result = await response.json();
+
+            if (result.success)
+            {
+                otpSection.classList.remove("is-hidden");
+                otpError.textContent = "OTP sent to your phone";
+                currentPhoneReg = phone;
+            }
+            else
+            {
+                otpError.textContent = result.message || "Could not send OTP.";
+            }
         }
-        else
+        catch (error)
         {
-            otpError.textContent = result.message;
+            console.error("send_otp failed:", error);
+            otpError.textContent = "Could not send OTP. Try again.";
+        }
+        finally
+        {
+            sendOTPBtn.disabled = false;
         }
     });
 }
 
-if(verifyOTPBtn)
+if (verifyOTPBtn)
 {
     verifyOTPBtn.addEventListener("click", async () => {
-        const phone = phoneInput.value.trim();
         const code = document.getElementById("otp-code").value.trim();
 
-        const response = await fetch("/verify_otp", {
-            method: "POST",
-            body: new URLSearchParams({ phone, code })
-        });
-
-        const result = await response.json();
-        if (result.success) {
-            alert("Phone verified!");
-            otpError.textContent = "Phone verified!";
-            otpSection.style.display = "none";
-            document.querySelector("#slide4 .next-btn").disabled = false;
-        }
-        else
+        try
         {
-            otpError.textContent = result.message;
+            const response = await fetch("/verify_otp", {
+                method: "POST",
+                body: new URLSearchParams({phone: currentPhoneReg, code})
+            });
+            const result = await response.json();
+
+            if (result.success)
+            {
+                otpError.textContent = "Phone verified!";
+                otpSection.classList.add("is-hidden");
+                document.querySelector("#slide4 .next-btn").disabled = false;
+            }
+            else
+            {
+                otpError.textContent = result.message;
+            }
+        }
+        catch (error)
+        {
+            otpError.textContent = "Could not verify the code. Try again.";
         }
     });
 }
