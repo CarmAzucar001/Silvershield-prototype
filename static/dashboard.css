@@ -329,7 +329,8 @@
         padding-right: 1rem;
         flex-wrap: wrap;
     }
-}*/
+}
+*/
 
 @media screen and (max-width: 500px) and (orientation: portrait){
     .dashboardContainer {
