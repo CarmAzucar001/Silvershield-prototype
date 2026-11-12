@@ -316,7 +316,7 @@
     }
 }
 
-@media (max-width: 640px) {
+/*@media (max-width: 640px) {
     .dashboardContainer {
         padding-top: 13rem;
         padding-left: 1rem;
@@ -330,6 +330,7 @@
         flex-wrap: wrap;
     }
 }
+*/
 
 @media screen and (max-width: 500px) and (orientation: portrait){
     .dashboardContainer {
