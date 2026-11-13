@@ -194,6 +194,14 @@ a new CSS class called help that use different values*/
     background-repeat: no-repeat;
 }
 
+/*Only handles the Switch Icon - Calls the base Icon CSS Class and creates its own switch class using the base*/
+.icon.switch {
+    top: 150px;
+    left: 4%;
+    height: 7%;
+    background-image: url(images/switchIcon.png);
+    background-repeat: no-repeat;
+}
 
 .icon-title {
     position: absolute;
@@ -399,6 +407,9 @@ a new CSS class called help that use different values*/
     display: none;
     color: black;
 }
+
+
+
 
 /*****************************
       Internet Window
@@ -1216,6 +1227,169 @@ a new CSS class called help that use different values*/
     border: 1px solid #dbe3ef;
     border-radius: 14px;
 }
+
+/*******************************
+Dark Mode Styles - Gmail Window
+/********************************/
+
+body.dark-mode .gmail-content-shell {
+    background: #000000;
+}
+
+body.dark-mode .gmail-reading-pane {
+    background: #262626;
+    border-color: #cfcdcd;
+}
+
+body.dark-mode .gmail-topbar {
+    background: #000000;
+    border-color: #ffffff;
+}
+
+body.dark-mode .gmail-searchbar input{
+    background: #3f4040;
+    color: #ffffff;
+}
+
+body.dark-mode .gmail-brand{
+    color: #928e8e;
+}
+
+body.dark-mode #emailContent,
+body.dark-mode #emailContent * {
+    color: #c0bdbd !important;
+}
+
+body.dark-mode .gmail-sidebar {
+    background: #000000;
+    border-color: #ffffff;
+}
+
+body.dark-mode .gmail-nav-item {
+    color: #006bfa;
+}
+
+body.dark-mode .gmail-message-toolbar {
+    border: #ffffff;
+    background: #262626;
+    color: #d9d9d9;
+}
+
+body.dark-mode .popup-header {
+    background: #262626;
+    color: #d9d9d9;
+    border-bottom: 1px solid #ffffff;
+}
+
+body.dark-mode .popup-close{
+    color: #c01616;
+}
+
+/*******************************
+Dark Mode Styles - Internet Window
+/********************************/
+
+body.dark-mode .chrome-shell .desktop-actions-row{
+    background: #000000;
+
+}
+
+body.dark-mode .chrome-tabs-row{
+    background: #000000;
+    border-color: #dcdcdc;
+}
+
+body.dark-mode .chrome-tab {
+    background: #6c6c6c;
+    color: #e8e8e8;
+}
+
+body.dark-mode .chrome-nav-icon {
+    background: #a5a5a5;
+}
+
+body.dark-mode .chrome-nav-buttons,
+.chrome-toolbar-tools {
+    color: #ffffff;
+}
+
+body.dark-mode .browser-bar {
+    background: #4f4f4f;
+    border-color: #ffffff;
+}
+
+body.dark-mode .chrome-toolbar {
+    background: #000000;
+    border-color: #ffffff;
+}
+
+body.dark-mode .chrome-bookmarks-row {
+    background: #000000;
+    border-color: #ffffff;
+}
+
+body.dark-mode .chrome-chip {
+    background: #777778;
+    color: #e8e8e8;
+}
+
+body.dark-mode .internet-search-meta,
+.google-results-stats {
+    color: #dedede;
+}
+
+body.dark-mode #internetContent > p {
+    color: #dedede;
+}
+
+body.dark-mode .chrome-shell {
+    background: #000000;
+    border-color: #ffffff;
+}
+
+body.dark-mode .internet-content {
+    background: #4b4b4b;
+    border-color: #ffffff;
+}
+
+body.dark-mode .fake-body {
+    background: #000000;
+    border-color: #ffffff;
+}
+
+body.dark-mode .fake-body * {
+    background: #666666;
+    color: #dedede !important;
+}
+
+body.dark-mode .search-result-title {
+    color: #3e81d2;
+}
+
+body.dark-mode .search-result-link {
+    color: #3bb360;
+}
+
+body.dark-mode .search-result-card {
+    background: #494949;
+}
+
+body.dark-mode .search-result-favicon {
+    filter: invert(1);
+}
+
+body.dark-mode .browser-bar input {
+    color: #ffffff;
+}
+
+body.dark-mode .search-result-description {
+    color: #dedede;
+}
+
+body.dark-mode .sponsored-label {
+    color: #dedede;
+}
+
 
 /*Media Query for the Mobile phone*/
 
